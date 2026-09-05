@@ -36,7 +36,7 @@ import {
 import { NetworkDropdown, NETWORKS } from "@/components/layout/NetworkDropdown";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { useSwitchNetwork } from "@/hooks/useSwitchNetwork";
-import { DOCS_URL, GITHUB_URL } from "@/lib/env";
+import { DEFAULT_NETWORK, DOCS_URL, GITHUB_URL } from "@/lib/env";
 
 interface HeaderProps {
   connected?: boolean;
@@ -48,6 +48,7 @@ export function Header({ connected = true, onToggleSidebar }: HeaderProps) {
   const { network, switchNetwork } = useSwitchNetwork();
   const { resolvedTheme, setTheme } = useTheme();
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const showNetworkToggle = DEFAULT_NETWORK !== "mainnet";
 
   return (
     <header className="flex h-20 shrink-0 items-center justify-between border-b border-border px-6">
@@ -89,7 +90,7 @@ export function Header({ connected = true, onToggleSidebar }: HeaderProps) {
         {/* Desktop: theme, network, and disconnect as separate controls */}
         <div className="hidden items-center gap-2 lg:flex">
           <ThemeToggle />
-          <NetworkDropdown />
+          {showNetworkToggle && <NetworkDropdown />}
           {connected && (
             <Button variant="outline" onClick={() => setConfirmOpen(true)}>
               <LogOut />
@@ -114,21 +115,25 @@ export function Header({ connected = true, onToggleSidebar }: HeaderProps) {
                 {resolvedTheme === "dark" ? <Sun /> : <Moon />}
                 {resolvedTheme === "dark" ? "Light mode" : "Dark mode"}
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>Network</DropdownMenuLabel>
-                {NETWORKS.map((option) => (
-                  <DropdownMenuItem
-                    key={option.id}
-                    onClick={() => void switchNetwork(option.id)}
-                    className="gap-2.5 py-3 text-base"
-                  >
-                    <span className={`size-2.5 rounded-full ${option.dotClassName}`} />
-                    {option.label}
-                    {option.id === network && <Check className="ml-auto size-4" />}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuGroup>
+              {showNetworkToggle && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel>Network</DropdownMenuLabel>
+                    {NETWORKS.map((option) => (
+                      <DropdownMenuItem
+                        key={option.id}
+                        onClick={() => void switchNetwork(option.id)}
+                        className="gap-2.5 py-3 text-base"
+                      >
+                        <span className={`size-2.5 rounded-full ${option.dotClassName}`} />
+                        {option.label}
+                        {option.id === network && <Check className="ml-auto size-4" />}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuGroup>
+                </>
+              )}
               {connected && (
                 <>
                   <DropdownMenuSeparator />
